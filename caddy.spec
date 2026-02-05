@@ -31,7 +31,7 @@ BuildRequires:  systemd-rpm-macros
 %{?systemd_requires}
 
 # BuildRequires for Go (xcaddy will be installed at build time)
-BuildRequires:  golang
+BuildRequires: golang >= 1.25
 
 Provides:       webserver
 
