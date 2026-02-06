@@ -6,9 +6,8 @@ Release:        2%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
-Packager:       Salman Shafi <hello@salmanshafi.net>
+Maintainer:     Salman Shafi <hello@salmanshafi.net>
 
-# Source URLs
 Source0:        https://raw.githubusercontent.com/caddyserver/caddy/v%{version}/cmd/caddy/main.go
 Source10:       https://raw.githubusercontent.com/caddyserver/dist/master/config/Caddyfile
 Source20:       https://raw.githubusercontent.com/caddyserver/dist/master/init/caddy.service
@@ -18,42 +17,54 @@ Source30:       https://raw.githubusercontent.com/caddyserver/dist/master/welcom
 Source90:       https://raw.githubusercontent.com/caddyserver/caddy/v%{version}/LICENSE
 
 BuildRequires:  git-core
-BuildRequires:  systemd
 BuildRequires:  systemd-rpm-macros
 %{?systemd_requires}
+
 BuildRequires:  golang >= 1.25
 
 Provides:       webserver
 
+
 %description
-Caddy is a fast, extensible web server with automatic HTTPS support. 
-This build includes support for Cloudflare and RFC2136 DNS providers.
+Caddy is an extensible server platform that uses TLS by default.
+This build includes official DNS modules for Cloudflare and RFC2136.
+
 
 %prep
 %setup -q -c -T
 cp %{S:0} %{S:90} .
 
-%build
-export GOPROXY='https://proxy.golang.org,direct'
-go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-export PATH=$PATH:$(go env GOPATH)/bin
 
-# Build with Official Caddy-DNS Modules
-xcaddy build v%{version} \
+%build
+%undefine _auto_set_build_flags
+
+export GOPROXY='https://proxy.golang.org,direct'
+export GOSUMDB='sum.golang.org'
+
+go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+
+$(go env GOPATH)/bin/xcaddy build v%{version} \
     --with github.com/caddy-dns/cloudflare \
-    --with github.com/caddy-dns/rfc2136
+    --with github.com/caddy-dns/rfc2136 \
+    --output ./caddy
+
 
 %install
 install -D -p -m 0755 caddy %{buildroot}%{_bindir}/caddy
+
 ./caddy manpage --directory %{buildroot}%{_mandir}/man8
+
 install -D -p -m 0644 %{S:10} %{buildroot}%{_sysconfdir}/caddy/Caddyfile
+
 install -D -p -m 0644 %{S:20} %{buildroot}%{_unitdir}/caddy.service
 install -D -p -m 0644 %{S:21} %{buildroot}%{_unitdir}/caddy-api.service
+
 install -D -p -m 0644 %{S:22} %{buildroot}%{_sysusersdir}/caddy.conf
+
 install -d -m 0750 %{buildroot}%{_sharedstatedir}/caddy
+
 install -D -p -m 0644 %{S:30} %{buildroot}%{_datadir}/caddy/index.html
 
-# Shell completions
 install -d -m 0755 %{buildroot}%{_datadir}/bash-completion/completions
 ./caddy completion bash > %{buildroot}%{_datadir}/bash-completion/completions/caddy
 install -d -m 0755 %{buildroot}%{_datadir}/zsh/site-functions
@@ -61,17 +72,57 @@ install -d -m 0755 %{buildroot}%{_datadir}/zsh/site-functions
 install -d -m 0755 %{buildroot}%{_datadir}/fish/vendor_completions.d
 ./caddy completion fish > %{buildroot}%{_datadir}/fish/vendor_completions.d/caddy.fish
 
+
 %pre
+%if 0%{?el7}
+%sysusers_create_compat %{S:22}
+%else
 %sysusers_create_package %{name} %{S:22}
+%endif
+
 
 %post
 %systemd_post caddy.service
 
+if [ -x /usr/sbin/getsebool ]; then
+    setsebool -P httpd_can_network_connect on
+fi
+if [ -x /usr/sbin/semanage -a -x /usr/sbin/restorecon ]; then
+    semanage fcontext --add --type httpd_exec_t        '%{_bindir}/caddy'               2> /dev/null || :
+    semanage fcontext --add --type httpd_sys_content_t '%{_datadir}/caddy(/.*)?'        2> /dev/null || :
+    semanage fcontext --add --type httpd_config_t      '%{_sysconfdir}/caddy(/.*)?'     2> /dev/null || :
+    semanage fcontext --add --type httpd_var_lib_t     '%{_sharedstatedir}/caddy(/.*)?' 2> /dev/null || :
+    restorecon -r %{_bindir}/caddy %{_datadir}/caddy %{_sysconfdir}/caddy %{_sharedstatedir}/caddy || :
+fi
+if [ -x /usr/sbin/semanage ]; then
+    semanage port --add --type http_port_t --proto udp 80   2> /dev/null || :
+    semanage port --add --type http_port_t --proto udp 443  2> /dev/null || :
+    semanage port --add --type http_port_t --proto tcp 2019 2> /dev/null || :
+fi
+
+
 %preun
 %systemd_preun caddy.service
 
+
 %postun
 %systemd_postun_with_restart caddy.service
+
+if [ $1 -eq 0 ]; then
+    if [ -x /usr/sbin/getsebool ]; then
+        setsebool -P httpd_can_network_connect off
+    fi
+    if [ -x /usr/sbin/semanage ]; then
+        semanage fcontext --delete --type httpd_exec_t        '%{_bindir}/caddy'               2> /dev/null || :
+        semanage fcontext --delete --type httpd_sys_content_t '%{_datadir}/caddy(/.*)?'        2> /dev/null || :
+        semanage fcontext --delete --type httpd_config_t      '%{_sysconfdir}/caddy(/.*)?'     2> /dev/null || :
+        semanage fcontext --delete --type httpd_var_lib_t     '%{_sharedstatedir}/caddy(/.*)?' 2> /dev/null || :
+        semanage port     --delete --type http_port_t --proto udp 80   2> /dev/null || :
+        semanage port     --delete --type http_port_t --proto udp 443  2> /dev/null || :
+        semanage port     --delete --type http_port_t --proto tcp 2019 2> /dev/null || :
+    fi
+fi
+
 
 %files
 %license LICENSE
@@ -90,4 +141,4 @@ install -d -m 0755 %{buildroot}%{_datadir}/fish/vendor_completions.d
 
 %changelog
 * Fri Feb 06 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-2
-- CloudFlare & RFC2136 DNS Module added
+- Added official DNS modules: Cloudflare & RFC2136
