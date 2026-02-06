@@ -40,10 +40,12 @@ cp %{S:0} %{S:90} .
 
 export GOPROXY='https://proxy.golang.org,direct'
 export GOSUMDB='sum.golang.org'
+export GOBIN=$(pwd)
+export PATH=$PATH:$(pwd)
 
 go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 
-$(go env GOPATH)/bin/xcaddy build v%{version} \
+./xcaddy build v%{version} \
     --with github.com/caddy-dns/cloudflare \
     --with github.com/caddy-dns/rfc2136 \
     --output ./caddy
@@ -52,6 +54,7 @@ $(go env GOPATH)/bin/xcaddy build v%{version} \
 %install
 install -D -p -m 0755 caddy %{buildroot}%{_bindir}/caddy
 
+install -d -m 0755 %{buildroot}%{_mandir}/man8
 ./caddy manpage --directory %{buildroot}%{_mandir}/man8
 
 install -D -p -m 0644 %{S:10} %{buildroot}%{_sysconfdir}/caddy/Caddyfile
