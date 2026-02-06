@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.10.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -24,16 +24,15 @@ BuildRequires:  golang >= 1.25
 
 Provides:       webserver
 
-
 %description
 Caddy is an extensible server platform that uses TLS by default.
-This build includes official DNS modules for Cloudflare and RFC2136.
-
+This build includes official DNS modules for Cloudflare and RFC2136,
+plus additional modules: MaxMind geolocation, HTTP cache handler,
+HTTP rate limiting, and Layer 4 support.
 
 %prep
 %setup -q -c -T
 cp %{S:0} %{S:90} .
-
 
 %build
 %undefine _auto_set_build_flags
@@ -48,8 +47,11 @@ go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 ./xcaddy build v%{version} \
     --with github.com/caddy-dns/cloudflare \
     --with github.com/caddy-dns/rfc2136 \
+    --with github.com/porech/caddy-maxmind-geolocation \
+    --with github.com/caddyserver/cache-handler \
+    --with github.com/mholt/caddy-ratelimit \
+    --with github.com/mholt/caddy-l4 \
     --output ./caddy
-
 
 %install
 install -D -p -m 0755 caddy %{buildroot}%{_bindir}/caddy
@@ -75,14 +77,12 @@ install -d -m 0755 %{buildroot}%{_datadir}/zsh/site-functions
 install -d -m 0755 %{buildroot}%{_datadir}/fish/vendor_completions.d
 ./caddy completion fish > %{buildroot}%{_datadir}/fish/vendor_completions.d/caddy.fish
 
-
 %pre
 %if 0%{?el7}
 %sysusers_create_compat %{S:22}
 %else
 %sysusers_create_package %{name} %{S:22}
 %endif
-
 
 %post
 %systemd_post caddy.service
@@ -103,10 +103,8 @@ if [ -x /usr/sbin/semanage ]; then
     semanage port --add --type http_port_t --proto tcp 2019 2> /dev/null || :
 fi
 
-
 %preun
 %systemd_preun caddy.service
-
 
 %postun
 %systemd_postun_with_restart caddy.service
@@ -126,7 +124,6 @@ if [ $1 -eq 0 ]; then
     fi
 fi
 
-
 %files
 %license LICENSE
 %{_bindir}/caddy
@@ -143,5 +140,8 @@ fi
 %{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %changelog
-* Fri Feb 06 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-2
+* Sat Feb 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-4
+- Added extra modules: MaxMind geolocation, HTTP cache handler, HTTP rate limiting, and Layer 4 support.
+
+* Fri Feb 06 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-3
 - Added official DNS modules: Cloudflare & RFC2136
