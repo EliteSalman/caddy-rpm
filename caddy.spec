@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.10.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -18,6 +18,7 @@ Source90:       https://raw.githubusercontent.com/caddyserver/caddy/v%{version}/
 
 BuildRequires:  git-core
 BuildRequires:  systemd-rpm-macros
+BuildRequires:  brotli-devel
 %{?systemd_requires}
 
 BuildRequires:  golang >= 1.25
@@ -28,7 +29,7 @@ Provides:       webserver
 Caddy is an extensible server platform that uses TLS by default.
 This build includes official DNS modules for Cloudflare and RFC2136,
 plus additional modules: MaxMind geolocation, HTTP cache handler,
-HTTP rate limiting, and Layer 4 support.
+HTTP rate limiting, Layer 4 support, and Brotli compression support.
 
 %prep
 %setup -q -c -T
@@ -44,13 +45,16 @@ export PATH=$PATH:$(pwd)
 
 go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
 
-./xcaddy build v%{version} \
+# Brotli support uses the reference Brotli C implementation
+# Requires brotli-devel installed at build time
+CGO_ENABLED=1 ./xcaddy build v%{version} \
     --with github.com/caddy-dns/cloudflare \
     --with github.com/caddy-dns/rfc2136 \
     --with github.com/porech/caddy-maxmind-geolocation \
     --with github.com/caddyserver/cache-handler \
     --with github.com/mholt/caddy-ratelimit \
     --with github.com/mholt/caddy-l4 \
+    --with github.com/dunglas/caddy-cbrotli \
     --output ./caddy
 
 %install
@@ -140,6 +144,9 @@ fi
 %{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %changelog
+* Sun Feb 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-5
+- Added Brotli compression support (caddy-cbrotli module).
+
 * Sat Feb 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-4
 - Added extra modules: MaxMind geolocation, HTTP cache handler, HTTP rate limiting, and Layer 4 support.
 
