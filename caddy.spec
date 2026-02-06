@@ -144,7 +144,7 @@ fi
 %{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %changelog
-* Sun Feb 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-5
+* Sat Feb 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-5
 - Added Brotli compression support (caddy-cbrotli module).
 
 * Sat Feb 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-4
