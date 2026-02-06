@@ -6,7 +6,7 @@ Release:        2%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
-Maintainer:     Salman Shafi <hello@salmanshafi.net>
+Packager:       Salman Shafi <hello@salmanshafi.net>
 
 Source0:        https://raw.githubusercontent.com/caddyserver/caddy/v%{version}/cmd/caddy/main.go
 Source10:       https://raw.githubusercontent.com/caddyserver/dist/master/config/Caddyfile
