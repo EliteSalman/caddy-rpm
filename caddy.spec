@@ -55,6 +55,7 @@ CGO_ENABLED=1 ./xcaddy build v%{version} \
     --with github.com/mholt/caddy-ratelimit \
     --with github.com/mholt/caddy-l4 \
     --with github.com/dunglas/caddy-cbrotli \
+    --with github.com/WeidiDeng/caddy-cloudflare-ip \
     --output ./caddy
 
 %install
