@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.2
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -59,7 +59,7 @@ CGO_ENABLED=1 ./xcaddy build v%{version} \
     --with github.com/dunglas/caddy-cbrotli \
     --with github.com/WeidiDeng/caddy-cloudflare-ip \
     --with github.com/pberkel/caddy-storage-redis \
-    --with github.com/caddy-dns/dns01proxy \
+    --with github.com/liujed/caddy-dns01proxy \
     --output ./caddy
 
 %install
