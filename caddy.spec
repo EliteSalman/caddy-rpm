@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.2
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
