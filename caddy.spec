@@ -1,8 +1,8 @@
 %global debug_package %{nil}
 
 Name:           caddy
-Version:        2.11.1
-Release:        2%{?dist}
+Version:        2.11.2
+Release:        3%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -21,7 +21,7 @@ BuildRequires:  systemd-rpm-macros
 BuildRequires:  brotli-devel
 %{?systemd_requires}
 
-BuildRequires:  golang >= 1.25
+BuildRequires:  golang >= 1.26
 
 Provides:       webserver
 
