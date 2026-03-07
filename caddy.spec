@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -29,7 +29,9 @@ Provides:       webserver
 Caddy is an extensible server platform that uses TLS by default.
 This build includes official DNS modules for Cloudflare and RFC2136,
 plus additional modules: MaxMind geolocation, HTTP cache handler,
-HTTP rate limiting, Layer 4 support, and Brotli compression support.
+HTTP rate limiting, Layer 4 support, Brotli compression support,
+Redis storage/session support, DNS-01 challenge proxy support,
+and Cloudflare IP range trusted proxy support.
 
 %prep
 %setup -q -c -T
@@ -56,6 +58,8 @@ CGO_ENABLED=1 ./xcaddy build v%{version} \
     --with github.com/mholt/caddy-l4 \
     --with github.com/dunglas/caddy-cbrotli \
     --with github.com/WeidiDeng/caddy-cloudflare-ip \
+    --with github.com/pberkel/caddy-storage-redis \
+    --with github.com/caddy-dns/dns01proxy \
     --output ./caddy
 
 %install
@@ -145,6 +149,13 @@ fi
 %{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %changelog
+* Sat Mar 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.1-1
+- Added Redis storage support (caddy-storage-redis module).
+- Added DNS-01 challenge proxy support (dns01proxy module).
+
+* Mon Feb 16 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-6
+- Added Cloudflare IP range trusted proxy support (caddy-cloudflare-ip module).
+
 * Sat Feb 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-5
 - Added Brotli compression support (caddy-cbrotli module).
 
