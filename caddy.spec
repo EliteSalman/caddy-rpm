@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.2
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -28,10 +28,9 @@ Provides:       webserver
 %description
 Caddy is an extensible server platform that uses TLS by default.
 This build includes official DNS modules for Cloudflare and RFC2136,
-plus additional modules: MaxMind geolocation, HTTP cache handler,
-HTTP rate limiting, Layer 4 support, Brotli compression support,
-Redis storage/session support, DNS-01 challenge proxy support,
-and Cloudflare IP range trusted proxy support.
+plus additional modules: MaxMind geolocation, HTTP rate limiting,
+Layer 4 support, Brotli compression support, DNS-01 challenge proxy
+support, and Cloudflare IP range trusted proxy support.
 
 %prep
 %setup -q -c -T
@@ -53,12 +52,10 @@ CGO_ENABLED=1 ./xcaddy build v%{version} \
     --with github.com/caddy-dns/cloudflare \
     --with github.com/caddy-dns/rfc2136 \
     --with github.com/porech/caddy-maxmind-geolocation \
-    --with github.com/caddyserver/cache-handler \
     --with github.com/mholt/caddy-ratelimit \
     --with github.com/mholt/caddy-l4 \
     --with github.com/dunglas/caddy-cbrotli \
     --with github.com/WeidiDeng/caddy-cloudflare-ip \
-    --with github.com/darkweak/storages/redis/caddy \
     --with github.com/liujed/caddy-dns01proxy \
     --output ./caddy
 
@@ -149,7 +146,10 @@ fi
 %{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %changelog
-* Tue Mar 10 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.2-6
+* Tue Mar 10 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.2-8
+- Removed HTTP cache handler and Redis storage modules due to technical complexity.
+
+* Tue Mar 10 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.2-7
 - Updated Redis storage module to github.com/darkweak/storages/redis/caddy.
 
 * Sat Mar 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.1-1
