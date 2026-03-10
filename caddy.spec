@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.2
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -149,7 +149,7 @@ fi
 %{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %changelog
-* Sat Mar 08 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.2-6
+* Tue Mar 10 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.2-6
 - Updated Redis storage module to github.com/darkweak/storages/redis/caddy.
 
 * Sat Mar 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.1-1
