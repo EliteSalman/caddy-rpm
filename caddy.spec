@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.2
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -58,7 +58,7 @@ CGO_ENABLED=1 ./xcaddy build v%{version} \
     --with github.com/mholt/caddy-l4 \
     --with github.com/dunglas/caddy-cbrotli \
     --with github.com/WeidiDeng/caddy-cloudflare-ip \
-    --with github.com/pberkel/caddy-storage-redis \
+    --with github.com/darkweak/storages/redis/caddy \
     --with github.com/liujed/caddy-dns01proxy \
     --output ./caddy
 
@@ -149,6 +149,9 @@ fi
 %{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %changelog
+* Sat Mar 08 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.2-6
+- Updated Redis storage module to github.com/darkweak/storages/redis/caddy.
+
 * Sat Mar 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.1-1
 - Added Redis storage support (caddy-storage-redis module).
 - Added DNS-01 challenge proxy support (dns01proxy module).
