@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -143,7 +143,7 @@ fi
 
 %changelog
 * Sat Jul 11 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.4-2
-- Replaced %sysusers_create_package with portable useradd/groupadd for Debian compatibility.
+- Replaced %%sysusers_create_package with portable useradd/groupadd for Debian compatibility.
 - Removed Source22/sysusers file install as no longer needed.
 - Added Brotli build comment.
 
