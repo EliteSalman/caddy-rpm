@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -84,11 +84,11 @@ install -d -m 0755 %{buildroot}%{_datadir}/fish/vendor_completions.d
 ./caddy completion fish > %{buildroot}%{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %pre
-%if 0%{?el7}
-%sysusers_create_compat %{S:22}
-%else
-%sysusers_create_package %{name} %{S:22}
-%endif
+getent group caddy >/dev/null || groupadd -r caddy
+getent passwd caddy >/dev/null || \
+    useradd -r -g caddy -d /var/lib/caddy -s /sbin/nologin \
+            -c "Caddy web server" caddy
+exit 0
 
 %post
 %systemd_post caddy.service
@@ -146,6 +146,13 @@ fi
 %{_datadir}/fish/vendor_completions.d/caddy.fish
 
 %changelog
+* Sat Jul 11 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.4-2
+- Replaced %sysusers_create_package with portable useradd/groupadd for Debian compatibility.
+- Added Brotli build comment.
+
+* Sat Jul 11 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.4-1
+- Bump to 2.11.4.
+
 * Tue Mar 10 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.2-8
 - Removed HTTP cache handler and Redis storage modules due to technical complexity.
 
@@ -163,7 +170,7 @@ fi
 - Added Brotli compression support (caddy-cbrotli module).
 
 * Sat Feb 07 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-4
-- Added extra modules: MaxMind geolocation, HTTP cache handler, HTTP rate limiting, and Layer 4 support.
+- Added extra modules: MaxMind geolocation, HTTP rate limiting, and Layer 4 support.
 
 * Fri Feb 06 2026 Salman Shafi <hello@salmanshafi.net> - 2.10.2-3
 - Added official DNS modules: Cloudflare & RFC2136
