@@ -2,7 +2,7 @@
 
 Name:           caddy
 Version:        2.11.4
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Web server with automatic HTTPS
 License:        Apache-2.0
 URL:            https://caddyserver.com
@@ -12,7 +12,6 @@ Source0:        https://raw.githubusercontent.com/caddyserver/caddy/v%{version}/
 Source10:       https://raw.githubusercontent.com/caddyserver/dist/master/config/Caddyfile
 Source20:       https://raw.githubusercontent.com/caddyserver/dist/master/init/caddy.service
 Source21:       https://raw.githubusercontent.com/caddyserver/dist/master/init/caddy-api.service
-Source22:       https://raw.githubusercontent.com/caddyserver/dist/master/init/caddy.sysusers
 Source30:       https://raw.githubusercontent.com/caddyserver/dist/master/welcome/index.html
 Source90:       https://raw.githubusercontent.com/caddyserver/caddy/v%{version}/LICENSE
 
@@ -69,8 +68,6 @@ install -D -p -m 0644 %{S:10} %{buildroot}%{_sysconfdir}/caddy/Caddyfile
 
 install -D -p -m 0644 %{S:20} %{buildroot}%{_unitdir}/caddy.service
 install -D -p -m 0644 %{S:21} %{buildroot}%{_unitdir}/caddy-api.service
-
-install -D -p -m 0644 %{S:22} %{buildroot}%{_sysusersdir}/caddy.conf
 
 install -d -m 0750 %{buildroot}%{_sharedstatedir}/caddy
 
@@ -137,7 +134,6 @@ fi
 %{_datadir}/caddy
 %{_unitdir}/caddy.service
 %{_unitdir}/caddy-api.service
-%{_sysusersdir}/caddy.conf
 %dir %{_sysconfdir}/caddy
 %config(noreplace) %{_sysconfdir}/caddy/Caddyfile
 %attr(0750,caddy,caddy) %dir %{_sharedstatedir}/caddy
@@ -148,6 +144,7 @@ fi
 %changelog
 * Sat Jul 11 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.4-2
 - Replaced %sysusers_create_package with portable useradd/groupadd for Debian compatibility.
+- Removed Source22/sysusers file install as no longer needed.
 - Added Brotli build comment.
 
 * Sat Jul 11 2026 Salman Shafi <hello@salmanshafi.net> - 2.11.4-1
